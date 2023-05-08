@@ -1,6 +1,7 @@
 #ifndef FRACTION_HPP
 #define FRACTION_HPP
 #include <iostream>
+#include <bits/stdc++.h>
 
 namespace ariel{
     class Fraction{
@@ -11,21 +12,29 @@ namespace ariel{
         public:
 
             Fraction(double n=0): denominator(1), numerator(n) {}
-            Fraction(double n, double d): denominator(d), numerator(n){}
+            Fraction(double n, double d): denominator(d), numerator(n);
             double getDominator(){ return denominator;}
             double getNumerator(){ return numerator; }
-            
-            
-            
-            //unary operators
+            Fraction minimizeFraction(); //return reduced form of fraction if possible
 
+            
+            /*unary operators---------------------------------------------------
 
-            Fraction& operator--(){return (*this);}          //prefix --> caliing ref adds one to the original
-            Fraction& operator++(){return (*this);}
-            const Fraction operator--(int);       //postfix --> calling copy ctor that adds one trturn copy (original not changed)
+            prefix --> caliing ref adds one to the original*/
+            Fraction& operator--(){
+                this->numerator = (this->getNumerator()-1);
+                return (*this);}          
+            Fraction& operator++(){
+                this->numerator = (this->getNumerator()+1);
+                return (*this);} //add if not minize or n=d
+            
+            /*postfix --> calling copy ctor that adds one trturn copy (original not changed)*/
+            const Fraction operator--(int);       
             const Fraction operator++(int);
 
-            //friend binary operators 
+
+
+            /*friend binary operators------------------------------------------*/
 
             friend Fraction operator+(const Fraction& a,const Fraction& b);
             friend Fraction operator-(const Fraction& a,const Fraction& b);
