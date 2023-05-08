@@ -1,80 +1,60 @@
 #include "Fraction.hpp"
 #include <bits/stdc++.h>
+#include <algorithm>
 using namespace ariel;
 
-ariel::Fraction::Fraction(double n, double d)
-{
-    if(d == 0) throw "Can't divide by 0";
-    if(floor(n) == ceil(n) && floor(d) == ceil(d)){         //rational numbers
-        this->numerator = n;
-        this->denominator = d;
-    }
-    //_r is the remainder. 0 in n&d int
-    double n_r = n - floor(n);
-    if(n_r){
-        double n_n = floor(n)*1000 + n_r;
-        double n_d = 1000;
-    } 
-
-
-
-    double d_r = d - floor(d);
-    
-
-
-}
-
+/*
+    fraction are created and changed to reduced form is needed in the contractor 
+    instead of checking in the start of every method.
+    and every method return the fraction with minimize action
+*/
 Fraction ariel::Fraction::minimizeFraction()
 {
-    if(this->denominator % this->numerator ==0){
-
+    //get gcd(n,d) then divide by it to get the reduced form
+    //if  gcd(n,d) = 1  already in reduced form return itself, if not divide by the gcd.
+    int gcd = std::__gcd(this->numerator,this->denominator);
+    if(gcd == 1) return (*this);
+    else{
+        auto n = this->numerator/gcd;
+        auto d = this->denominator/gcd;
+        return Fraction(n,d);
     }
-    return Fraction();
 }
 
 const Fraction ariel::Fraction::operator--(int)
 {
     auto n = this->numerator-1;
     auto d = this->denominator;
-    //add is minimize or n=d
-    return Fraction(n,d);
+    return Fraction(n,d).minimizeFraction();
 }
 
 const Fraction ariel::Fraction::operator++(int)
 {
     auto n = this->numerator+1;
     auto d = this->denominator;
-    //add is minimize or n=d
-    return Fraction(n,d);
+    return Fraction(n,d).minimizeFraction();
 }
 
 Fraction ariel::operator+(const Fraction &a, const Fraction &b)
 {
-    if(a.denominator == b.denominator){
-            auto d = a.denominator;
-            auto n = a.numerator + b.numerator;
-            //check if minimize
-            return Fraction(n,d);
+    int n,d;
+    if(a.denominator == b.denominator) {return Fraction(a.numerator+b.numerator, a.denominator).minimizeFraction();}
+    //add case for gcd(a.denominator,b.denominator) != 1
+    if(std::__gcd(n,d) == 1){
+        auto common_d = a.denominator * b.denominator;
+        auto common_n = a.numerator*b.denominator +a.denominator*b.numerator;
+        return Fraction(common_n,common_d).minimizeFraction();
     }
-    else if(a.denominator % b.denominator == 0){
-
-    }
-    else {}
+    else {
+         
+    
+    } 
     return Fraction();
 }
 
 Fraction ariel::operator-(const Fraction &a, const Fraction &b)
 {
-    if(a.denominator == b.denominator){
-            auto d = a.denominator;
-            auto n = a.numerator + b.numerator;
-            //check if minimize
-            return Fraction(n,d);
-    }
-    else if(a.denominator % b.denominator == 0){
 
-    }
-    else {}
     return Fraction();
 }
 
@@ -125,6 +105,51 @@ bool ariel::operator<=(const Fraction &a, const Fraction &b)
 {
     //minimize a
     //minimize b
+    return false;
+}
+
+Fraction ariel::operator+(const Fraction &a, double b)
+{
+    return Fraction();
+}
+
+Fraction ariel::operator-(const Fraction &a, double b)
+{
+    return Fraction();
+}
+
+Fraction ariel::operator*(const Fraction &a, double b)
+{
+    return Fraction();
+}
+
+Fraction ariel::operator/(const Fraction &a, double b)
+{
+    return Fraction();
+}
+
+bool ariel::operator==(const Fraction &a, double b)
+{
+    return false;
+}
+
+bool ariel::operator>(const Fraction &a, double b)
+{
+    return false;
+}
+
+bool ariel::operator<(const Fraction &a, double b)
+{
+    return false;
+}
+
+bool ariel::operator>=(const Fraction &a, double b)
+{
+    return false;
+}
+
+bool ariel::operator<=(const Fraction &a, double b)
+{
     return false;
 }
 
