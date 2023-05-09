@@ -9,19 +9,21 @@ using namespace ariel;
 */
 
 
-/* return new fraction after adding 1 to original */
+/* postfix, return new fracequal to original then sub 1 to original */
 const Fraction ariel::Fraction::operator--(int)
 {
     //  1 equals (denominator / denominator)
-    auto n = this->numerator-this->denominator;
+    auto n = this->numerator;
     auto d = this->denominator;
+    this->numerator = this->numerator-this->denominator;
     return minimizeFraction(Fraction(n,d));
 }
-/* return new fraction after adding 1 to original */
+/* postfix, return new frac equal to original then adding 1 to original */
 const Fraction ariel::Fraction::operator++(int)
 {
-    auto n = this->numerator+this->denominator;
+    auto n = this->numerator;
     auto d = this->denominator;
+    this->numerator = this->numerator+this->denominator;
     return minimizeFraction(Fraction(n,d));
 }
 /*
@@ -32,29 +34,29 @@ Fraction ariel::minimizeFraction(const Fraction& frac1)
 {
     //get gcd(n,d) then divide by it to get the reduced form
     //if  gcd(n,d) = 1  already in reduced form return itself, if not divide by the gcd.
-    int gcd = std::__gcd(a.numerator,a.denominator);
-    if(gcd == 1) return a;
+    int gcd = std::__gcd(frac1.numerator,frac1.denominator);
+    if(gcd == 1) return frac1;
     else{
-        auto n = a.numerator/gcd;
-        auto d = a.denominator/gcd;
-        return Fraction(n,d);
+        auto n_frac = frac1.numerator/gcd;
+        auto d_frac = frac1.denominator/gcd;
+        return Fraction(n_frac,d_frac);
         }
 }
 
 /* input double output the equal improper fraction */
-Fraction ariel::decimal2frac(double f)
+Fraction ariel::decimal2frac(double num)
 {
-    int n,d = 1000; //limit of 3 after the point
-    double f_rem;
-    if(floor(f) == ceil(f)) return Fraction(d,1); //if d is integar return fraction d/1
+    int n_frac,d_frac = DEC_LIM; //limit of 3 after the point
+    double num_rem;
+    if(floor(num) == ceil(num)) return Fraction(d_frac,1); //if d is integar return fraction d/1
     /* 
         seperate double to int and decimal.
         the denominator for double is 1000 (reason above),
         the numernator is decimal conveted to int + the whole part times 1000
     */
-    std::modf(f,&f_rem);
-    n = floor(f)*d + (int(f_rem*d));
-    return Fraction(n,d);
+    std::modf(num,&num_rem);
+    n_frac = floor(num)*d_frac + (int(num_rem*d_frac));
+    return Fraction(n_frac,d_frac);
 }
 
 // binary op frac vs frac
@@ -209,13 +211,13 @@ bool ariel::operator<=(const Fraction& frac1, double num)
     else return false;
 }
 
-std::ostream &ariel::operator<<(std::ostream &output, const Fraction& frac2)
+std::ostream &ariel::operator<<(std::ostream &output, const Fraction& frac)
 {
     // TODO: insert return statement here
     return output;
 }
 
-std::istream &ariel::operator>>(std::istream &input, Fraction &b)
+std::istream &ariel::operator>>(std::istream &input, Fraction &frac)
 {
     // TODO: insert return statement here
     return input;
