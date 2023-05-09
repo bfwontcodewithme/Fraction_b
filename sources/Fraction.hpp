@@ -23,7 +23,7 @@ namespace ariel{
             Fraction(int num=0): numerator(num),denominator(1) {}
             Fraction(int num, int den): numerator(num), denominator(den){
                 if(den == 0){
-                    throw "Can't divide by 0";   
+                    throw std::invalid_argument("Denominator must not be zero");   
                 }    
                 auto gcd = std::__gcd(num,den);
                 this->denominator = den/gcd;
@@ -32,15 +32,15 @@ namespace ariel{
             Fraction(double num){
                     int n_frac = 0;
                     int d_frac = DEC_LIM; //limit of 3 after the point
-                    double num_rem = 0;
+                    double num_rem = num - floor(num);
                     if(floor(num) == ceil(num)){
                         this->denominator = 1;
                         this->numerator = (int)num;
                     } //if d is integar return fraction d/1
-                    std::modf(num,&num_rem);
-                    n_frac = (int)floor(num)*d_frac + (int(num_rem*d_frac));
-                    this->denominator = d_frac;
-                    this->numerator = n_frac;
+                    n_frac = (int(floor(num)))*d_frac + (int(num_rem*d_frac));
+                    int gcd = std::__gcd(n_frac,d_frac);
+                    this->denominator = d_frac/gcd;
+                    this->numerator = n_frac/gcd;
             }
             int getDenominator()const{ return denominator;}
             int getNumerator()const{ return numerator; }
@@ -76,12 +76,16 @@ namespace ariel{
             friend bool operator<(const Fraction& frac1,const Fraction& frac2);
             friend bool operator>=(const Fraction& frac1,const Fraction& frac2);
             friend bool operator<=(const Fraction& frac1,const Fraction& frac2);
-
+          
             /*friend binary operators-----------------fraction vs. double---------------------------*/
             friend Fraction operator+(const Fraction& frac1,double num);
             friend Fraction operator-(const Fraction& frac1,double num);
             friend Fraction operator*(const Fraction& frac1,double num);
             friend Fraction operator/(const Fraction& frac1,double num);
+            //friend Fraction operator+(double num,const Fraction& frac1){return frac1+num;}
+            friend Fraction operator-(double num,const Fraction& frac1){return frac1-num;}
+            friend Fraction operator*(double num,const Fraction& frac1){return frac1*num;}
+            friend Fraction operator/(double num,const Fraction& frac1){return frac1/num;}
             friend bool operator==(const Fraction& frac1,double num);
             friend bool operator>(const Fraction& frac1,double num);
             friend bool operator<(const Fraction& frac1,double num);
