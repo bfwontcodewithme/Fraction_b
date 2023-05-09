@@ -12,7 +12,7 @@ for every method the Fraction suppose to be in reduced form -- reduced in the co
 *
 *
 */
-#define DEC_LIM 1000;
+const int DEC_LIM = 1000;
 namespace ariel{
     class Fraction{
         private:
@@ -32,15 +32,18 @@ namespace ariel{
             Fraction(double num){
                     int n_frac = 0;
                     int d_frac = DEC_LIM; //limit of 3 after the point
-                    double num_rem = num - floor(num);
+                    double num_rem = num - floor(num); //geting the value after the point
+                    
+                    //if d is integar return fraction d/1
                     if(floor(num) == ceil(num)){
                         this->denominator = 1;
                         this->numerator = (int)num;
-                    } //if d is integar return fraction d/1
-                    n_frac = (int(floor(num)))*d_frac + (int(num_rem*d_frac));
+                    } 
+                    n_frac = (int)((floor(num))*d_frac) + (int(num_rem*d_frac));
                     int gcd = std::__gcd(n_frac,d_frac);
                     this->denominator = d_frac/gcd;
                     this->numerator = n_frac/gcd;
+                    std::cout << this->denominator << this->numerator << std::endl;
             }
             int getDenominator()const{ return denominator;}
             int getNumerator()const{ return numerator; }
