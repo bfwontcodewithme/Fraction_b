@@ -23,7 +23,7 @@ namespace ariel{
             Fraction(int num=0): numerator(num),denominator(1) {}
             Fraction(int num, int den): numerator(num), denominator(den){
                 if(den == 0){
-                    throw std::invalid_argument("Denominator must not be zero");   
+                    throw std::invalid_argument("0 is not valid denominator");   
                 }    
                 auto gcd = std::__gcd(num,den);
                 this->denominator = den/gcd;
@@ -39,11 +39,10 @@ namespace ariel{
                         this->denominator = 1;
                         this->numerator = (int)num;
                     } 
-                    n_frac = (int)((floor(num))*d_frac) + (int(num_rem*d_frac));
+                    n_frac = (int)((floor(num))*d_frac) + (int)(num_rem*d_frac);
                     int gcd = std::__gcd(n_frac,d_frac);
                     this->denominator = d_frac/gcd;
                     this->numerator = n_frac/gcd;
-                    std::cout << this->denominator << this->numerator << std::endl;
             }
             int getDenominator()const{ return denominator;}
             int getNumerator()const{ return numerator; }
@@ -67,7 +66,6 @@ namespace ariel{
 
 
             friend Fraction minimizeFraction(const Fraction& frac);
-            friend Fraction decimal2frac(double num);
             /*friend binary operators-----------------fraction vs. fraction-------------------------*/
 
             friend Fraction operator+(const Fraction& frac1,const Fraction& frac2);
@@ -81,20 +79,25 @@ namespace ariel{
             friend bool operator<=(const Fraction& frac1,const Fraction& frac2);
           
             /*friend binary operators-----------------fraction vs. double---------------------------*/
-            friend Fraction operator+(const Fraction& frac1,double num);
-            friend Fraction operator-(const Fraction& frac1,double num);
-            friend Fraction operator*(const Fraction& frac1,double num);
-            friend Fraction operator/(const Fraction& frac1,double num);
-            //friend Fraction operator+(double num,const Fraction& frac1){return frac1+num;}
-            friend Fraction operator-(double num,const Fraction& frac1){return frac1-num;}
-            friend Fraction operator*(double num,const Fraction& frac1){return frac1*num;}
-            friend Fraction operator/(double num,const Fraction& frac1){return frac1/num;}
+            friend Fraction operator+(const Fraction& frac1,double num){return Fraction(frac1 + Fraction(num));}
+            friend Fraction operator-(const Fraction& frac1,double num){return Fraction(frac1 - Fraction(num));}
+            friend Fraction operator*(const Fraction& frac1,double num){return Fraction(frac1 * Fraction(num));}
+            friend Fraction operator/(const Fraction& frac1,double num){return Fraction(frac1 / Fraction(num));}
+            friend Fraction operator+(double num,const Fraction& frac1){return Fraction(num)+frac1;}
+            friend Fraction operator-(double num,const Fraction& frac1){return Fraction(num)-frac1;}
+            friend Fraction operator*(double num,const Fraction& frac1){return Fraction(num)*frac1;}
+            friend Fraction operator/(double num,const Fraction& frac1){return Fraction(num)/frac1;}
             friend bool operator==(const Fraction& frac1,double num);
             friend bool operator>(const Fraction& frac1,double num);
             friend bool operator<(const Fraction& frac1,double num);
             friend bool operator>=(const Fraction& frac1,double num);
             friend bool operator<=(const Fraction& frac1,double num);
-            //friend global ip operator - in pdf
+            friend bool operator==(double num,const Fraction& frac1){return (frac1 == Fraction(num));}
+            friend bool operator>(double num,const Fraction& frac1){return (Fraction(num) > frac1);}
+            friend bool operator<(double num,const Fraction& frac1){return (Fraction(num) < frac1);}
+            friend bool operator>=(double num,const Fraction& frac1){return (Fraction(num) >= frac1);}
+            friend bool operator<=(double num,const Fraction& frac1){return (Fraction(num) <= frac1);}
+            //friend global ip operator 
             friend std::ostream& operator<<(std::ostream& output, const Fraction& frac);
             friend std::istream& operator>>(std::istream& input, Fraction& frac);
     };

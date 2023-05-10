@@ -3,11 +3,23 @@
 #include <algorithm>
 using namespace ariel;
 
-/*
-    fraction are created and changed to reduced form is needed in the contractor 
-    every method return the fraction with minimize action
-*/
+void check_overflow(const int num1, const int num2, bool mult = false)      //friend helped me
+{
+	int max_int = std::numeric_limits<int>::max();
+	int min_int = std::numeric_limits<int>::min();
 
+	bool overflow = (num1 > 0 && num2 > 0 && num2 > (max_int - num1)) || (num1 < 0 && num2 < 0 && num2 < (min_int - num1));
+	bool underflow = (num2 > 0 && num1 < (min_int + num2)) || (num2 < 0 && num1 > (max_int + num2));
+
+	if (mult) // if multiplication check
+	{
+		overflow = num1 > 0 && (max_int / num1) < num2;
+		underflow = overflow; // doesn't matter
+	}
+
+	if (overflow || underflow)
+		throw std::overflow_error{"operation has overflowed"};
+}
 
 /* postfix, return new fracequal to original then sub 1 to original */
 const Fraction ariel::Fraction::operator--(int)
@@ -40,79 +52,141 @@ Fraction ariel::minimizeFraction(const Fraction& frac1)
     return Fraction(n_frac,d_frac);
 }
 
-
 // binary op frac vs frac
 
 Fraction ariel::operator+(const Fraction& frac1, const Fraction& frac2)
 {
+    check_overflow(frac1.numerator, frac2.denominator,true);
+    check_overflow(frac2.numerator, frac1.denominator, true);
     // if equals -simple addition
     if(frac1.denominator == frac2.denominator) {return minimizeFraction(Fraction(frac1.numerator+frac2.numerator, frac1.denominator));}
     // if not equals finding gcd and multiply to get a common denominator
+
     auto gcd = std::__gcd(frac1.denominator,frac2.denominator);
-    auto mul_2 = std::abs(frac1.denominator/gcd);
-    auto mul_1 = std::abs(frac2.denominator/gcd);
-    auto common_n = frac1.numerator*mul_1 + frac2.numerator*mul_2;
-    auto common_d = frac1.denominator*mul_1;
-    return minimizeFraction(Fraction(common_n,common_d));
+    if(gcd == 1){
+        check_overflow(frac1.denominator,frac2.denominator, true);        
+        auto common_d = frac1.denominator*frac2.denominator;
+        auto common_n1 = frac1.numerator*frac2.denominator;
+        auto common_n2 = frac2.numerator*frac1.denominator;
+        check_overflow(common_n1,common_n2);
+        check_overflow(common_n1 +common_n2,common_d);
+        return minimizeFraction(Fraction(common_n1 +common_n2,common_d));
+    }
+    else {
+        auto mul_2 = frac1.denominator/gcd;
+        auto mul_1 = frac2.denominator/gcd;
+        auto common_n1 = frac1.numerator*mul_1;
+        auto common_n2 = frac2.numerator*mul_2;
+        check_overflow(frac1.denominator, mul_1, true);
+        auto common_d = frac1.denominator*mul_1;
+        check_overflow(common_n1,common_n2);
+        check_overflow(common_n1 +common_n2,common_d);
+        return minimizeFraction(Fraction(common_n1+common_n2,common_d));
+    }    
 }
 
 Fraction ariel::operator-(const Fraction& frac1, const Fraction& frac2)
 {
+    check_overflow(frac1.numerator, frac2.denominator,true);
+    check_overflow(frac2.numerator, frac1.denominator, true);
+    // if equals -simple addition
     if(frac1.denominator == frac2.denominator) {return minimizeFraction(Fraction(frac1.numerator-frac2.numerator, frac1.denominator));}
     // if not equals finding gcd and multiply to get a common denominator
     auto gcd = std::__gcd(frac1.denominator,frac2.denominator);
-    auto mul_2 = std::abs(frac1.denominator/gcd);
-    auto mul_1 = std::abs(frac2.denominator/gcd);
-    auto common_n = frac1.numerator*mul_1 - frac2.numerator*mul_2;
-    auto common_d = frac1.denominator*mul_1;
-    return minimizeFraction(Fraction(common_n,common_d));
+    if(gcd == 1){
+        check_overflow(frac1.denominator,frac2.denominator, true);
+        auto common_d = frac1.denominator*frac2.denominator;
+        auto common_n1 = frac1.numerator*frac2.denominator;
+        auto common_n2 = frac2.numerator*frac1.denominator;
+        check_overflow(common_n1,common_n2);
+        check_overflow(common_n1 -common_n2,common_d);
+        return minimizeFraction(Fraction(common_n1- common_n2,common_d));
+    }
+    else {
+        auto mul_2 = frac1.denominator/gcd;
+        auto mul_1 = frac2.denominator/gcd;
+        auto common_n1 = frac1.numerator*mul_1;
+        auto common_n2 = frac2.numerator*mul_2;
+        check_overflow(frac1.denominator, mul_1, true);
+        auto common_d = frac1.denominator*mul_1;
+        check_overflow(common_n1,common_n2);
+        check_overflow(common_n1 -common_n2,common_d);
+        return minimizeFraction(Fraction(common_n1-common_n2,common_d));
+    } 
 }
 
 Fraction ariel::operator*(const Fraction& frac1, const Fraction& frac2)
 {
+    check_overflow(frac1.numerator, frac2.denominator,true);
+    check_overflow(frac2.numerator, frac1.denominator, true);
     auto d = frac1.denominator*frac2.denominator;
     auto n = frac1.numerator*frac2.numerator;
+    check_overflow(n,d);
     return minimizeFraction(Fraction(n,d));
 }
 
 Fraction ariel::operator/(const Fraction& frac1, const Fraction& frac2)
 {
     //multiply a with inverse b
+    if (frac2.getNumerator() == 0) throw std::runtime_error("Can't divide by 0");
+    check_overflow(frac1.numerator, frac2.denominator,true);
+    check_overflow(frac2.numerator, frac1.denominator, true);
     auto n = frac1.numerator*frac2.denominator;
     auto d = frac1.denominator*frac2.numerator;
+    check_overflow(n,d);
     return minimizeFraction(Fraction(n,d));
 }
 
 bool ariel::operator==(const Fraction& frac1, const Fraction& frac2)
 {
-    /* sending to get reduced form ,if already is then returned the same */
-    auto frac1_m = minimizeFraction(frac1);
-    auto frac2_m = minimizeFraction(frac2);
-    /* comparing the members of reduced form */
-    if(frac1_m.denominator ==frac2_m.denominator && frac1_m.numerator == frac2_m.numerator) return true;
-    else return false;
+    if(frac1.denominator ==frac2.denominator && frac1.numerator == frac2.numerator) return true;
+    auto gcd = std::__gcd(frac1.denominator,frac2.denominator);
+    if(gcd == 1){
+        auto common_n1 = frac1.numerator*frac2.denominator;
+        auto common_n2 = frac2.numerator*frac1.denominator;
+        return (common_n1 == common_n2);
+    }
+    else {
+        auto mul_2 = frac1.denominator/gcd;
+        auto mul_1 = frac2.denominator/gcd;
+        auto common_n1 = frac1.numerator*mul_1;
+        auto common_n2 = frac2.numerator*mul_2;
+        return (common_n1 == common_n2);
+    }
 }
 
 bool ariel::operator>(const Fraction& frac1, const Fraction& frac2)
 {
-    auto frac1_m = minimizeFraction(frac1);
-    auto frac2_m = minimizeFraction(frac2);
-    auto gcd = std::__gcd(frac1_m.denominator, frac2_m.denominator);
-    auto mul_f2 = frac1_m.denominator/gcd;
-    auto mul_f1 = frac2_m.denominator/gcd;
-    if(frac1_m.numerator*mul_f1 > frac2_m.numerator*mul_f2) return true;
-    else return false;
+    auto gcd = std::__gcd(frac1.denominator,frac2.denominator);
+    if(gcd == 1){
+        auto common_n1 = frac1.numerator*frac2.denominator;
+        auto common_n2 = frac2.numerator*frac1.denominator;
+        return (common_n1 > common_n2);
+    }
+    else {
+        auto mul_2 = frac1.denominator/gcd;
+        auto mul_1 = frac2.denominator/gcd;
+        auto common_n1 = frac1.numerator*mul_1;
+        auto common_n2 = frac2.numerator*mul_2;
+        return (common_n1 > common_n2);
+    }
 }
 
 bool ariel::operator<(const Fraction& frac1, const Fraction& frac2)
 {
-    auto frac1_m = minimizeFraction(frac1);
-    auto frac2_m = minimizeFraction(frac2);
-    auto gcd = std::__gcd(frac1_m.denominator, frac2_m.denominator);
-    auto mul_f2 = frac1_m.denominator/gcd;
-    auto mul_f1 = frac2_m.denominator/gcd;
-    if(frac1_m.numerator*mul_f1 < frac2_m.numerator*mul_f2) return true;
-    else return false;
+    auto gcd = std::__gcd(frac1.denominator,frac2.denominator);
+    if(gcd == 1){
+        auto common_n1 = frac1.numerator*frac2.denominator;
+        auto common_n2 = frac2.numerator*frac1.denominator;
+        return (common_n1 < common_n2);
+    }
+    else {
+        auto mul_2 = frac1.denominator/gcd;
+        auto mul_1 = frac2.denominator/gcd;
+        auto common_n1 = frac1.numerator*mul_1;
+        auto common_n2 = frac2.numerator*mul_2;
+        return (common_n1 < common_n2);
+    }
 }
 
 bool ariel::operator>=(const Fraction& frac1, const Fraction& frac2)
@@ -127,27 +201,7 @@ bool ariel::operator<=(const Fraction& frac1, const Fraction& frac2)
     else return false;
 }
 
-// binary op double vs fraction --> using the decimal2fraction and fvf operators 
-
-Fraction ariel::operator+(const Fraction& frac1, double num)
-{
-    return Fraction(frac1 + Fraction(num));
-}
-
-Fraction ariel::operator-(const Fraction& frac1, double num)
-{
-    return Fraction(frac1 - Fraction(num));
-}
-
-Fraction ariel::operator*(const Fraction& frac1, double num)
-{
-    return Fraction(frac1 * Fraction(num));
-}
-
-Fraction ariel::operator/(const Fraction& frac1, double num)
-{
-    return Fraction(frac1 / Fraction(num));
-}
+// binary op double vs fraction
 
 bool ariel::operator==(const Fraction &frac1, double num)
 {
@@ -181,12 +235,23 @@ bool ariel::operator<=(const Fraction& frac1, double num)
 
 std::ostream &ariel::operator<<(std::ostream &output, const Fraction& frac)
 {
-    // TODO: insert return statement here
-    return output;
+
+    return output << frac.numerator << "/" << frac.denominator;;
 }
 
 std::istream &ariel::operator>>(std::istream &input, Fraction &frac)
 {
-    // TODO: insert return statement here
+    int num,den;
+    input >> num >> den;
+    if(den == 0){
+        throw std::runtime_error("0 is not valid denominator");
+    }
+    if(!input){
+        throw std::runtime_error("Missing second value");
+    }
+    frac.denominator = den;
+    frac.numerator = num;
+
     return input;
 }
+
