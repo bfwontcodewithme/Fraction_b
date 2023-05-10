@@ -83,10 +83,10 @@ namespace ariel{
             friend Fraction operator-(const Fraction& frac1,double num){return Fraction(frac1 - Fraction(num));}
             friend Fraction operator*(const Fraction& frac1,double num){return Fraction(frac1 * Fraction(num));}
             friend Fraction operator/(const Fraction& frac1,double num){return Fraction(frac1 / Fraction(num));}
-            friend Fraction operator+(double num,const Fraction& frac1){return Fraction(num)+frac1;}
-            friend Fraction operator-(double num,const Fraction& frac1){return Fraction(num)-frac1;}
-            friend Fraction operator*(double num,const Fraction& frac1){return Fraction(num)*frac1;}
-            friend Fraction operator/(double num,const Fraction& frac1){return Fraction(num)/frac1;}
+            friend Fraction operator+(double num,const Fraction& frac1){return Fraction(Fraction(num)+frac1);}
+            friend Fraction operator-(double num,const Fraction& frac1){return Fraction(Fraction(num)-frac1);}
+            friend Fraction operator*(double num,const Fraction& frac1){return Fraction(Fraction(num)*frac1);}
+            friend Fraction operator/(double num,const Fraction& frac1){return Fraction(Fraction(num)/frac1);}
             friend bool operator==(const Fraction& frac1,double num);
             friend bool operator>(const Fraction& frac1,double num);
             friend bool operator<(const Fraction& frac1,double num);

@@ -7,18 +7,17 @@ void check_overflow(const int num1, const int num2, bool mult = false)      //fr
 {
 	int max_int = std::numeric_limits<int>::max();
 	int min_int = std::numeric_limits<int>::min();
-
 	bool overflow = (num1 > 0 && num2 > 0 && num2 > (max_int - num1)) || (num1 < 0 && num2 < 0 && num2 < (min_int - num1));
 	bool underflow = (num2 > 0 && num1 < (min_int + num2)) || (num2 < 0 && num1 > (max_int + num2));
 
-	if (mult) // if multiplication check
-	{
+	if (mult){ // if multiplication check
 		overflow = num1 > 0 && (max_int / num1) < num2;
 		underflow = overflow; // doesn't matter
 	}
 
-	if (overflow || underflow)
-		throw std::overflow_error{"operation has overflowed"};
+	if (overflow || underflow){
+		throw std::overflow_error("operation has overflowed");
+    }
 }
 
 /* postfix, return new fracequal to original then sub 1 to original */
@@ -46,7 +45,7 @@ Fraction ariel::minimizeFraction(const Fraction& frac1)
 {
     //get gcd(n,d) then divide by it to get the reduced form
     //if  gcd(n,d) = 1  already in reduced form return itself, if not divide by the gcd.
-    int gcd = std::__gcd(frac1.numerator,frac1.denominator);
+    int gcd = std::abs(std::__gcd(frac1.numerator,frac1.denominator));
     auto n_frac = frac1.numerator/gcd;
     auto d_frac = frac1.denominator/gcd;
     return Fraction(n_frac,d_frac);
